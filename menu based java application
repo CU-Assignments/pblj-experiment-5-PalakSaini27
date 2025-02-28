@@ -1,0 +1,133 @@
+import java.io.*;
+import java.util.*;
+
+class Employee implements Serializable {
+    private int id;
+    private String name;
+    private String designation;
+    private double salary;
+
+    // Constructor
+    public Employee(int id, String name, String designation, double salary) {
+        this.id = id;
+        this.name = name;
+        this.designation = designation;
+        this.salary = salary;
+    }
+
+    // Getters
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    // To display employee details
+    @Override
+    public String toString() {
+        return "Employee ID: " + id + ", Name: " + name + ", Designation: " + designation + ", Salary: " + salary;
+    }
+}
+
+public class EmployeeManager {
+
+    // File to store employee data
+    private static final String FILE_NAME = "employees.ser";
+
+    // Method to add employee
+    private static void addEmployee() {
+        Scanner scanner = new Scanner(System.in);
+
+        // Gather employee details
+        System.out.println("Enter Employee ID:");
+        int id = scanner.nextInt();
+        scanner.nextLine();  // Consume the newline
+        System.out.println("Enter Employee Name:");
+        String name = scanner.nextLine();
+        System.out.println("Enter Employee Designation:");
+        String designation = scanner.nextLine();
+        System.out.println("Enter Employee Salary:");
+        double salary = scanner.nextDouble();
+
+        // Create employee object
+        Employee employee = new Employee(id, name, designation, salary);
+
+        // Serialize the employee object to the file
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME, true))) {
+            out.writeObject(employee);
+            System.out.println("Employee added successfully.");
+        } catch (IOException e) {
+            System.err.println("Error: Could not save the employee data.");
+        }
+    }
+
+    // Method to display all employees
+    private static void displayAllEmployees() {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            boolean hasEmployees = false;
+            while (true) {
+                try {
+                    Employee employee = (Employee) in.readObject();
+                    System.out.println(employee);
+                    hasEmployees = true;
+                } catch (EOFException e) {
+                    break; // End of file reached
+                }
+            }
+
+            if (!hasEmployees) {
+                System.out.println("No employees to display.");
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("Error: Employee data file not found.");
+        } catch (IOException e) {
+            System.err.println("Error: An error occurred while reading the employee data.");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Error: Employee class not found.");
+        }
+    }
+
+    // Method to display the menu and handle user choice
+    public static void displayMenu() {
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\nEmployee Management Menu:");
+            System.out.println("1. Add Employee");
+            System.out.println("2. Display All Employees");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    addEmployee();
+                    break;
+                case 2:
+                    displayAllEmployees();
+                    break;
+                case 3:
+                    System.out.println("Exiting the program.");
+                    break;
+                default:
+                    System.out.println("Invalid choice, please try again.");
+            }
+        } while (choice != 3);
+    }
+
+    // Main method to start the program
+    public static void main(String[] args) {
+        displayMenu();
+    }
+}
