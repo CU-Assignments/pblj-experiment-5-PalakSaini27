@@ -1,0 +1,69 @@
+import java.io.*;
+
+// Student class implementing Serializable
+class Student implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    private int id;
+    private String name;
+    private double GPA;
+
+    // Constructor
+    public Student(int id, String name, double GPA) {
+        this.id = id;
+        this.name = name;
+        this.GPA = GPA;
+    }
+
+    // Getters for the fields
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getGPA() {
+        return GPA;
+    }
+
+    // To display student details
+    @Override
+    public String toString() {
+        return "Student [ID=" + id + ", Name=" + name + ", GPA=" + GPA + "]";
+    }
+}
+
+public class SerializeDeserializeStudent {
+
+    public static void main(String[] args) {
+        // File to store the serialized object
+        String fileName = "student.ser";
+
+        // Create a student object
+        Student student = new Student(1, "John Doe", 3.75);
+
+        // Serialize the Student object
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
+            out.writeObject(student);
+            System.out.println("Student object serialized and saved to file.");
+        } catch (FileNotFoundException e) {
+            System.err.println("Error: The file was not found.");
+        } catch (IOException e) {
+            System.err.println("Error: An IO exception occurred during serialization.");
+        }
+
+        // Deserialize the Student object
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
+            Student deserializedStudent = (Student) in.readObject();
+            System.out.println("Deserialized Student details: " + deserializedStudent);
+        } catch (FileNotFoundException e) {
+            System.err.println("Error: The file was not found.");
+        } catch (IOException e) {
+            System.err.println("Error: An IO exception occurred during deserialization.");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Error: The Student class was not found.");
+        }
+    }
+}
